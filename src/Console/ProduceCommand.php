@@ -5,7 +5,6 @@ namespace Laborer\LaravelRabbitMQ\Console;
 use Exception;
 use Illuminate\Console\Command;
 use Laborer\LaravelRabbitMQ\Base\RabbitMQConnect;
-use Laborer\LaravelRabbitMQ\Base\RabbitMQService;
 
 /**
  * Class PublishCommand
@@ -56,7 +55,7 @@ class ProduceCommand extends Command
             $vhost = $this->argument('vhost');
             if (!$vhost) $vhost = config('rabbitmq.vhost');
 
-            $service = new RabbitMQService(new RabbitMQConnect($vhost));
+            $service = app(config('rabbitmq.service'), ['channel' => new RabbitMQConnect($vhost)]);
             $service->validateRoutingKey($routing_key);
 
             // 如果是进行测试，就用测试数据

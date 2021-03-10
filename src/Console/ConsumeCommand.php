@@ -7,7 +7,6 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Laborer\LaravelRabbitMQ\Base\RabbitMQConnect;
-use Laborer\LaravelRabbitMQ\Base\RabbitMQService;
 
 /**
  * Class ConsumeCommand
@@ -56,7 +55,8 @@ class ConsumeCommand extends Command
             if (!$vhost) $vhost = config('rabbitmq.vhost');
 
             $channel = new RabbitMQConnect($vhost);
-            $service = new RabbitMQService($channel);
+
+            $service = app(config('rabbitmq.service'), ['channel' => $channel]);
 
             // 回调函数
             $callback = function ($msg) use ($service) {

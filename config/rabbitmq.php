@@ -28,4 +28,6 @@ return [
     'routing_keys' => [
         'order.create' => '创建订单',
     ],
+
+    'service' => \App\Services\RabbitMQService::class,
 ];
