@@ -1,5 +1,5 @@
 {
-  "name": "laborer-by/laravel-rabbitmq",
+  "name": "RayXu1003/laravel-rabbitmq",
   "keywords": ["rabbitmq", "laravel"],
   "description": "RabbitMQ driver for Laravel.",
   "license": "MIT",
