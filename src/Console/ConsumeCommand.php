@@ -1,5 +1,4 @@
 <?php
-
 namespace Laborer\LaravelRabbitMQ\Console;
 
 use Exception;
@@ -22,11 +21,11 @@ class ConsumeCommand extends Command
      * @var string
      */
     protected $signature = 'rabbitmq:consume
-                            {vhost? : The vhost of we choose to connect}
+                            {vhost : The vhost of we choose to connect}
+                            {queue : The names of the queues to work}
                             {--timeout=0 : The number of seconds a child process can run}
                             {--retry=3 : Number of times to retry}
-                            {--prefetch_count=1 : The number of messages every time to fetch}
-                            {--queue= : The names of the queues to work}';
+                            {--prefetch_count=1 : The number of messages every time to fetch}';
 
     /**
      * The console command description.
@@ -52,21 +51,19 @@ class ConsumeCommand extends Command
     {
         try {
             $vhost = $this->argument('vhost');
-            if (!$vhost) $vhost = config('rabbitmq.vhost');
+            $queue = $this->argument('queue');
 
             $channel = new RabbitMQConnect($vhost);
-
             $service = app(config('rabbitmq.service'), ['channel' => $channel]);
 
             // 回调函数
             $callback = function ($msg) use ($service) {
                 try {
                     // 消息内容
-                    $body = $msg->body;
-                    $body = json_decode($body, true);
+                    $body = json_decode($msg->body, true);
 
                     $msg_id = $body['msg_id'];
-                    $routing_key = $body['routing_key'];
+
                     $info = sprintf('Received msg_id:%s', $msg_id);
                     $this->info($info);
 
@@ -94,7 +91,7 @@ class ConsumeCommand extends Command
             $channel->basic_qos((int)$this->option('prefetch_count'));
 
             // 启动消费者，开启手动回执
-            $channel->basic_consume($this->option('queue'), $callback, (int) $this->option('timeout'));
+            $channel->basic_consume($queue, $callback, (int) $this->option('timeout'));
 
             // 最后，关闭 channel 和 connection
             $channel->close();
